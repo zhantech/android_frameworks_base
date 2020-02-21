@@ -165,7 +165,7 @@ public class ImageWallpaper extends WallpaperService {
             }
             if (!mNeedTransition) return;
             mWorker.getThreadHandler().post(
-                    () -> mRenderer.updateAmbientMode(inAmbientMode, animationDuration));
+                    () -> mRenderer.updateAmbientMode(inAmbientMode, duration));
             if (inAmbientMode && animationDuration == 0) {
                 // This means that we are transiting from home to aod, to avoid
                 // race condition between window visibility and transition,
