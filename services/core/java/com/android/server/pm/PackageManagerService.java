@@ -328,6 +328,8 @@ import com.android.server.security.VerityUtils;
 import com.android.server.storage.DeviceStorageMonitorInternal;
 import com.android.server.wm.ActivityTaskManagerInternal;
 
+import com.nvidia.NvAppProfileService;
+
 import dalvik.system.CloseGuard;
 import dalvik.system.VMRuntime;
 
@@ -845,6 +847,13 @@ public class PackageManagerService extends IPackageManager.Stub
                 String targetPath) {
             return getStaticOverlayPaths(targetPackageName, targetPath);
         }
+
+        @Override public NvAppProfileService getAppProfileService() {
+            if (mAppProfileService == null) {
+                mAppProfileService = new NvAppProfileService(mContext);
+            }
+            return mAppProfileService;
+        }
     }
 
     class ParallelPackageParserCallback extends PackageParserCallback {
@@ -905,6 +914,8 @@ public class PackageManagerService extends IPackageManager.Stub
     final SparseArray<InstallParams> mPendingEnableRollback = new SparseArray<>();
 
     final PackageInstallerService mInstallerService;
+
+    private NvAppProfileService mAppProfileService;
 
     final ArtManagerService mArtManagerService;
 
@@ -6475,6 +6486,7 @@ public class PackageManagerService extends IPackageManager.Stub
 
     @Override
     public List<String> getAllPackages() {
+        enforceSystemOrRootOrShell("getAllPackages is limited to privileged callers");
         final int callingUid = Binder.getCallingUid();
         final int callingUserId = UserHandle.getUserId(callingUid);
         synchronized (mPackages) {
@@ -12487,6 +12499,8 @@ public class PackageManagerService extends IPackageManager.Stub
                     if (hasOldPkg) {
                         mPermissionManager.revokeRuntimePermissionsIfGroupChanged(pkg, oldPkg,
                                 allPackageNames, mPermissionCallback);
+                        mPermissionManager.revokeStoragePermissionsIfScopeExpanded(pkg, oldPkg,
+                                mPermissionCallback);
                     }
                     if (hasPermissionDefinitionChanges) {
                         mPermissionManager.revokeRuntimePermissionsIfPermissionDefinitionChanged(

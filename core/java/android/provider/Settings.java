@@ -3466,16 +3466,8 @@ public final class Settings {
          */
         public static final String FONT_SCALE = "font_scale";
 
-        private static final Validator FONT_SCALE_VALIDATOR = new Validator() {
-            @Override
-            public boolean validate(@Nullable String value) {
-                try {
-                    return Float.parseFloat(value) >= 0;
-                } catch (NumberFormatException | NullPointerException e) {
-                    return false;
-                }
-            }
-        };
+        private static final Validator FONT_SCALE_VALIDATOR =
+                new SettingsValidators.InclusiveFloatRangeValidator(0.25f, 5.0f);
 
         /**
          * The serialized system locale value.
@@ -19648,6 +19640,12 @@ public final class Settings {
          */
         public static final String POWER_BUTTON_SUPPRESSION_DELAY_AFTER_GESTURE_WAKE =
                 "power_button_suppression_delay_after_gesture_wake";
+
+        /**
+         * The amount of time in milliseconds before bluetooth is turned off
+         * @hide
+         */
+        public static final String BLUETOOTH_OFF_TIMEOUT = "bluetooth_off_timeout";
     }
 
     /**
